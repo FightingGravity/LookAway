@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LookAway</string>
+
+    <string name="accessibility_service_description">LookAway automation engine for simulating automated clicks during active routines.</string>
+</resources>
