@@ -1,5 +1,6 @@
 # LookAway
-![LookAway Banner](lookaway_banner.png)
+<img width="1003" height="249" alt="lookaway_banner" src="https://github.com/user-attachments/assets/5e56040c-7b1c-4096-ae56-eb30f669c091" />
+
 
 An intelligent, lightweight Android automation utility that actively monitors your screen to detect and skip repetitive ads, so you don't have to.
 
