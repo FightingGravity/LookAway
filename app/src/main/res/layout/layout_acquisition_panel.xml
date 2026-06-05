@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#88000000">
+
+    <View
+        android:id="@+id/reticle_box"
+        android:layout_width="64px"
+        android:layout_height="64px"
+        android:background="@drawable/reticle_border" />
+
+    <LinearLayout
+        android:id="@+id/control_panel_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#333333"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/target_name_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Target Name"
+            android:textColorHint="#AAAAAA"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#FFFFFF"
+            android:inputType="text"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Slide to change box size"
+            android:textColor="#DDDDDD"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="4dp" />
+
+        <SeekBar
+            android:id="@+id/crop_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="256"
+            android:progress="64"
+            android:progressTint="#00e5ff"
+            android:thumbTint="#00e5ff"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Drag box to reposition."
+            android:textColor="#AAAAAA"
+            android:textSize="12sp"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_cancel_crop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cancel"
+                android:backgroundTint="#888888"
+                android:textColor="#FFFFFF"/>
+
+            <View android:layout_width="16dp" android:layout_height="match_parent"/>
+
+            <Button
+                android:id="@+id/btn_save_crop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Save"
+                android:backgroundTint="#00e5ff"
+                android:textColor="#FFFFFF"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

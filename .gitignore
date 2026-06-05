@@ -1,15 +1,21 @@
+# Standard Android Build Files
 *.iml
-.gradle
+.gradle/
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/build/
+/app/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# OS Specific
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+
+# Android Studio / IntelliJ
+.idea/
+
+# CRITICAL SECURITY (Do not remove)
+*.jks
+*.keystore
+key.properties
+google-services.json

@@ -58,6 +58,9 @@ dependencies {
     // OpenCV engine
     implementation("org.opencv:opencv:4.12.0")
 
+    // Glassmorphism BlurView
+    implementation("com.github.Dimezis:BlurView:version-2.0.3")
+
     // Core UI and Appcompat
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
@@ -69,4 +72,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)
+
+    implementation("com.google.code.gson:gson:2.10.1")
 }

@@ -7,17 +7,20 @@ import android.util.Log;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImageLibrary {
 
     public static class Template {
+        public String id;
         public String name;
         public Bitmap bitmap;
-        public Mat grayMat; // Pre-cached grayscale Mat
+        public Mat grayMat;
 
-        public Template(String name, Bitmap bitmap, Mat grayMat) {
+        public Template(String id, String name, Bitmap bitmap, Mat grayMat) {
+            this.id = id;
             this.name = name;
             this.bitmap = bitmap;
             this.grayMat = grayMat;
@@ -26,53 +29,31 @@ public class ImageLibrary {
 
     public static List<Template> loadTargetTemplates(Context context) {
         List<Template> templates = new ArrayList<>();
-        int[] ids = {R.drawable.close1, R.drawable.close2, R.drawable.close3, R.drawable.close4, R.drawable.close5,
-                R.drawable.close6, R.drawable.close7, R.drawable.close8, R.drawable.close9, R.drawable.close10,
-                R.drawable.close11, R.drawable.close12, R.drawable.close13};
-        String[] names = {"close1", "close2", "close3", "close4", "close5", "close6", "close7", "close8", "close9",
-                "close10", "close11", "close12", "close13"};
+        TargetRepository repository = new TargetRepository(context);
+        List<TargetModel> savedTargets = repository.getAllTargets();
 
-        for (int i = 0; i < ids.length; i++) {
-            Template template = load(context, names[i], ids[i]);
-            // Only add healthy, fully-loaded templates to the engine
-            if (template != null) {
-                templates.add(template);
+        for (TargetModel target : savedTargets) {
+            File imgFile = new File(target.getImagePath());
+            if (imgFile.exists()) {
+                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                if (bitmap != null) {
+                    try {
+                        Mat mat = new Mat();
+                        Utils.bitmapToMat(bitmap, mat);
+
+                        Mat grayMat = new Mat();
+                        Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGBA2GRAY);
+                        mat.release();
+
+                        templates.add(new Template(target.getId(), target.getName(), bitmap, grayMat));
+                        Log.d("LookAway", "Successfully loaded target: " + target.getName());
+                    } catch (Exception e) {
+                        Log.e("LookAway", "OpenCV Conversion failed for: " + target.getName(), e);
+                    }
+                }
             }
         }
+        Log.d("LookAway", "Total targets loaded into brain: " + templates.size());
         return templates;
-    }
-
-    private static Template load(Context context, String name, int resourceId) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false; // Important: prevent Android from resizing your assets
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
-
-        // SAFTEY CHECK 1: Did the image file actually decode into a Bitmap?
-        if (bitmap == null) {
-            Log.e("LookAway", "Asset Error: Could not decode " + name + ". Check if the file is corrupted or missing.");
-            return null;
-        }
-
-        Mat temp = new Mat();
-        Utils.bitmapToMat(bitmap, temp);
-
-        // Convert to Grayscale (1-channel, 8-bit)
-        Mat gray = new Mat();
-        Imgproc.cvtColor(temp, gray, Imgproc.COLOR_RGBA2GRAY);
-
-        // Release temporary RGBA Mat to save memory
-        temp.release();
-
-        // SAFETY CHECK 2: Is the resulting OpenCV Matrix valid?
-        if (gray.empty()) {
-            Log.e("LookAway", "Asset Error: OpenCV created an empty matrix for " + name);
-            gray.release();
-            bitmap.recycle();
-            return null;
-        }
-
-        // Return template with full-resolution grayscale Mat
-        return new Template(name, bitmap, gray);
     }
 }

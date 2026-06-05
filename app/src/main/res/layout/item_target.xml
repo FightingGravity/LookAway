@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eightbitlab.com.blurview.BlurView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_blur_wrapper"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="3dp"
+    android:background="@drawable/bg_glass"
+    android:clipToOutline="true"
+    app:blurOverlayColor="#55000000">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:gravity="center_vertical">
+
+        <CheckBox
+            android:id="@+id/target_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/cyan_glow"/>
+
+        <ImageView
+            android:id="@+id/target_thumbnail"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:scaleType="centerCrop"
+            android:background="#222222" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/target_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Target_Name"
+                android:textColor="@color/text_bright"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/target_hits"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hits (30d): 0"
+                android:textColor="@color/cyan_glow"
+                android:textSize="12sp"
+                android:layout_marginTop="1dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</eightbitlab.com.blurview.BlurView>

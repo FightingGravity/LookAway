@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="cyan_glow">#00E5FF</color>
+    <color name="cyan_dark">#008B99</color>
+    <color name="bg_deep_dark">#0B0F19</color>
+    <color name="bg_dark_surface">#111827</color>
+    <color name="glass_fill">#D90B0F19</color>  ```
+    <color name="glass_stroke">#8000E5FF</color>
+    <color name="text_bright">#F9FAFB</color>
+    <color name="text_muted">#9CA3AF</color>
+    <color name="red_alert">#EF4444</color>
 </resources>

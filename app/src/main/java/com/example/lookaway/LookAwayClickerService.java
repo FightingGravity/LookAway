@@ -31,8 +31,9 @@ public class LookAwayClickerService extends AccessibilityService {
 
         android.accessibilityservice.AccessibilityServiceInfo info = new android.accessibilityservice.AccessibilityServiceInfo();
 
-        // Tell the system what events we care about (clicks, scrolls, etc.)
-        info.eventTypes = android.view.accessibility.AccessibilityEvent.TYPES_ALL_MASK;
+        // CRITICAL OPTIMIZATION: We only need to dispatch clicks, not read the screen.
+        // Setting eventTypes to 0 stops the OS from flooding the app with UI updates, saving massive battery.
+        info.eventTypes = 0;
 
         // Set the feedback type to generic since we are an automation tool
         info.feedbackType = android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_GENERIC;
@@ -43,6 +44,13 @@ public class LookAwayClickerService extends AccessibilityService {
         info.notificationTimeout = 100;
 
         this.setServiceInfo(info);
+        Log.d("LookAway", "Accessibility Clicker Engine Connected & Optimized.");
+
+        // --- NEW: Auto-Return Logic ---
+        // Fire an intent to pull LookAway back to the foreground once access is granted
+        Intent returnIntent = new Intent(this, MainActivity.class);
+        returnIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(returnIntent);
     }
 
     /**
@@ -90,7 +98,7 @@ public class LookAwayClickerService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        // Required override. We don't need to listen to system events actively.
+        // Required override. Left empty to conserve battery.
     }
 
     @Override
@@ -101,6 +109,7 @@ public class LookAwayClickerService extends AccessibilityService {
     @Override
     public boolean onUnbind(Intent intent) {
         instance = null;
+        Log.d("LookAway", "Accessibility Clicker Engine Disconnected.");
         return super.onUnbind(intent);
     }
 

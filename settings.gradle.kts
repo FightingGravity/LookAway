@@ -19,9 +19,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Added JitPack so Gradle can find and download BlurView
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
 rootProject.name = "LookAway"
 include(":app")
- 
