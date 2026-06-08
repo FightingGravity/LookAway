@@ -1,5 +1,5 @@
 # LookAway
-![LookAway Banner](lookaway_banner.png)
+![lookaway_banner.png](app/src/main/res/drawable/lookaway_banner.png)
 
 An intelligent, lightweight Android automation utility that actively monitors your screen to detect and skip repetitive ads, so you don't have to.
 

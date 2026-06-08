@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/bg_data_stream">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="48dp">
+
+        <!-- PANE 1: REWARDED AD SENSING -->
+        <eightbitlab.com.blurview.BlurView
+            android:id="@+id/settings_blur"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginTop="36dp"
+            android:background="@drawable/bg_glass"
+            android:clipToOutline="true"
+            app:blurOverlayColor="#00000000"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rewarded Ad Sensing"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="LookAway will only automatically monitor in the selected applications."
+                    android:textColor="#AAAAAA"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="24dp"
+                    android:textAlignment="center"/>
+
+                <RadioGroup
+                    android:id="@+id/rg_mode_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/rb_automatic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Automatic Mode"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:buttonTint="#00e5ff" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="8dp">
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btn_monitored_apps"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_cyan_rounded"
+                            android:text="Select Monitored Apps"
+                            android:textColor="#000000"
+                            android:textStyle="bold"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="24dp" />
+
+                    <RadioButton
+                        android:id="@+id/rb_manual"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Manual Mode"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:buttonTint="#00e5ff" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="12dp">
+
+                        <TextView
+                            android:id="@+id/tv_slider_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Automatically stop scanning after 30 seconds."
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:layout_gravity="start"
+                            android:layout_marginBottom="8dp"/>
+
+                        <SeekBar
+                            android:id="@+id/sb_timeout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="21"
+                            android:progress="3"
+                            android:progressTint="#00e5ff"
+                            android:thumbTint="#00e5ff" />
+                    </LinearLayout>
+                </RadioGroup>
+            </LinearLayout>
+        </eightbitlab.com.blurview.BlurView>
+
+        <!-- PANE 2: AD BLOCKING -->
+        <eightbitlab.com.blurview.BlurView
+            android:id="@+id/ad_blocking_blur"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_glass"
+            android:clipToOutline="true"
+            app:blurOverlayColor="#00000000"
+            app:layout_constraintTop_toBottomOf="@id/settings_blur">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ad Blocking"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/tv_passive_ad_block_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="LookAway will block ads within the selected applications. The selected applications will function as if they are in airplane mode."
+                    android:textColor="#AAAAAA"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="24dp"
+                    android:textAlignment="center"/>
+
+                <Switch
+                    android:id="@+id/switch_passive_ad_block"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Passive Ad Blocking"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp"
+                    android:thumbTint="@color/switch_thumb"
+                    android:trackTint="@color/switch_track" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_blocked_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_cyan_rounded"
+                    android:text="Select Ad-Blocked Apps"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp"/>
+
+            </LinearLayout>
+        </eightbitlab.com.blurview.BlurView>
+
+        <!-- PANE 3: SCANNER SETTINGS -->
+        <eightbitlab.com.blurview.BlurView
+            android:id="@+id/scanner_settings_blur"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_glass"
+            android:clipToOutline="true"
+            app:blurOverlayColor="#00000000"
+            app:layout_constraintTop_toBottomOf="@id/ad_blocking_blur">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Scan Region"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:id="@+id/img_roi_multi"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginEnd="8dp"
+                        android:padding="4dp"
+                        android:background="@drawable/bg_roi_selector"
+                        android:src="@drawable/roi_multi"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <ImageView
+                        android:id="@+id/img_roi_top"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginHorizontal="8dp"
+                        android:padding="4dp"
+                        android:background="@drawable/bg_roi_selector"
+                        android:src="@drawable/roi_top"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <ImageView
+                        android:id="@+id/img_roi_bot"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginStart="8dp"
+                        android:padding="4dp"
+                        android:background="@drawable/bg_roi_selector"
+                        android:src="@drawable/roi_bot"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/roi_slider_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Margin Size: 20%"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_gravity="center_horizontal" />
+
+                <SeekBar
+                    android:id="@+id/roi_seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="24dp"
+                    android:max="45"
+                    android:progress="15"
+                    android:progressTint="#00e5ff"
+                    android:thumbTint="#00e5ff" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#44FFFFFF"
+                    android:layout_marginBottom="24dp"/>
+
+                <TextView
+                    android:id="@+id/accuracy_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Target Match Required: 85%"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="8dp"/>
+
+                <SeekBar
+                    android:id="@+id/accuracy_seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="95"
+                    android:min="60"
+                    android:progress="85"
+                    android:progressTint="#00e5ff"
+                    android:thumbTint="#00e5ff"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/accuracy_warning"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CAUTION: Low percentages may result in false positives."
+                    android:textColor="#ff9100"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="24dp"
+                    android:textAlignment="center"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#44FFFFFF"
+                    android:layout_marginBottom="24dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Widget Size"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="8dp"/>
+
+                <SeekBar
+                    android:id="@+id/widget_size_seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="150"
+                    android:min="50"
+                    android:progress="100"
+                    android:progressTint="#00e5ff"
+                    android:thumbTint="#00e5ff" />
+
+            </LinearLayout>
+        </eightbitlab.com.blurview.BlurView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

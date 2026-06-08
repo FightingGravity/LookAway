@@ -3,119 +3,132 @@ package com.example.lookaway;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Path;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class LookAwayClickerService extends AccessibilityService {
 
     private static LookAwayClickerService instance;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private String homeLauncherPackage = "";
+    private static final String TAG = "LookAway-Tracker";
 
-    /**
-     * Allows other parts of our app (like the Floating Widget or automation loops)
-     * to safely access the clicker engine.
-     */
-    public static LookAwayClickerService getInstance() {
-        return instance;
-    }
+    private boolean isAdActive = false;
+
+    public static LookAwayClickerService getInstance() { return instance; }
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-
-        // Lock in the global static instance so the brain can find the engine
         instance = this;
 
         android.accessibilityservice.AccessibilityServiceInfo info = new android.accessibilityservice.AccessibilityServiceInfo();
-
-        // CRITICAL OPTIMIZATION: We only need to dispatch clicks, not read the screen.
-        // Setting eventTypes to 0 stops the OS from flooding the app with UI updates, saving massive battery.
-        info.eventTypes = 0;
-
-        // Set the feedback type to generic since we are an automation tool
+        info.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
         info.feedbackType = android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_GENERIC;
-
-        // Use FLAG_INCLUDE_NOT_IMPORTANT_VIEWS so the engine can interact with non-standard view layers
-        info.flags = android.accessibilityservice.AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
-
         info.notificationTimeout = 100;
-
         this.setServiceInfo(info);
-        Log.d("LookAway", "Accessibility Clicker Engine Connected & Optimized.");
 
-        // --- NEW: Auto-Return Logic ---
-        // Fire an intent to pull LookAway back to the foreground once access is granted
-        Intent returnIntent = new Intent(this, MainActivity.class);
-        returnIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(returnIntent);
-    }
-
-    /**
-     * Simulates a single finger tap at a specific (x, y) coordinate on the screen.
-     */
-    public void clickAtCoordinates(int x, int y) {
-        // Prevent out-of-bounds negative coordinates from crashing the gesture builder
-        if (x < 0 || y < 0) {
-            Log.w("LookAway", "Invalid click coordinates: (" + x + ", " + y + "). Ignoring.");
-            return;
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo resolveInfo = getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (resolveInfo != null && resolveInfo.activityInfo != null) {
+            homeLauncherPackage = resolveInfo.activityInfo.packageName;
         }
 
-        // CRITICAL: Accessibility gestures MUST be dispatched on the Main Thread
+        Intent navIntent = new Intent(this, MainActivity.class);
+        navIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(navIntent);
+    }
+
+    public void clickAtCoordinates(int x, int y) {
+        if (x < 0 || y < 0) return;
         mainHandler.post(() -> {
             try {
                 Path clickPath = new Path();
                 clickPath.moveTo(x, y);
-
-                // Build a stroke description:
-                // Arguments: (path, start time delay in ms, duration of touch in ms)
-                // 50ms duration mimics a crisp, natural human tap.
-                GestureDescription.StrokeDescription clickStroke =
-                        new GestureDescription.StrokeDescription(clickPath, 0, 50);
-
+                GestureDescription.StrokeDescription clickStroke = new GestureDescription.StrokeDescription(clickPath, 0, 50);
                 GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
                 gestureBuilder.addStroke(clickStroke);
-
-                // Dispatches the gesture to the active screen layer
-                boolean dispatched = dispatchGesture(gestureBuilder.build(), new GestureResultCallback() {
-                    @Override
-                    public void onCompleted(GestureDescription gestureDescription) {
-                        super.onCompleted(gestureDescription);
-                        Log.d("LookAway", "Successfully clicked at (" + x + ", " + y + ")");
-                    }
-                }, null);
-
-                if (!dispatched) {
-                    Log.e("LookAway", "OS refused to dispatch gesture.");
-                }
+                dispatchGesture(gestureBuilder.build(), null, null);
             } catch (Exception e) {
-                Log.e("LookAway", "Error triggering system click: " + e.getMessage());
+                Log.e(TAG, "Error triggering click: " + e.getMessage());
             }
         });
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        // Required override. Left empty to conserve battery.
+        if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            String currentApp = event.getPackageName() != null ? event.getPackageName().toString() : "";
+            String currentClass = event.getClassName() != null ? event.getClassName().toString() : "";
+
+            if (currentApp.equals("com.android.systemui") ||
+                    currentClass.contains("LearningFirewallActivity") ||
+                    currentApp.equals(getPackageName())) return;
+
+            SharedPreferences prefs = getSharedPreferences("LookAwayPrefs", MODE_PRIVATE);
+            if (!prefs.getBoolean("is_automatic_mode", false)) return;
+
+            // 1. Identify Zones
+            Set<String> monitoredApps = prefs.getStringSet("monitored_apps_list", new HashSet<>());
+            boolean isGame = monitoredApps.contains(currentApp);
+            boolean isHome = currentApp.equals(homeLauncherPackage);
+            boolean isPlayStore = currentApp.equals("com.android.vending");
+
+            // 2. Scan Logic (Node Inspection Only)
+            boolean isHiddenAd = false;
+            AccessibilityNodeInfo root = getRootInActiveWindow();
+            if (root != null) {
+                isHiddenAd = searchForHiddenAdSignatures(root);
+                root.recycle();
+            }
+
+            // 3. State Management
+            if (isHiddenAd) {
+                isAdActive = true;
+                sendBroadcast(new Intent("com.example.lookaway.START_AUTO_SCAN").setPackage(getPackageName()));
+                sendBroadcast(new Intent("com.example.lookaway.VISUAL_AD_CAUGHT").setPackage(getPackageName()));
+            }
+            // Only close if we are in a safe zone (Game or Home) and NOT in the Play Store
+            else if ((isGame || isHome) && !isPlayStore) {
+                if (isAdActive) {
+                    isAdActive = false;
+                    sendBroadcast(new Intent("com.example.lookaway.STOP_AUTO_SCAN").setPackage(getPackageName()));
+                }
+            }
+        }
+    }
+
+    private boolean searchForHiddenAdSignatures(AccessibilityNodeInfo node) {
+        if (node == null) return false;
+        CharSequence className = node.getClassName();
+        if (className != null && (className.toString().toLowerCase().contains("webview") || className.toString().toLowerCase().contains("adview"))) return true;
+
+        CharSequence text = node.getText();
+        if (text != null && (text.toString().toLowerCase().equals("ad") || text.toString().toLowerCase().equals("sponsored"))) return true;
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            if (searchForHiddenAdSignatures(node.getChild(i))) return true;
+        }
+        return false;
     }
 
     @Override
-    public void onInterrupt() {
-        // Required override. Handles what happens if the system cuts off the service.
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        instance = null;
-        Log.d("LookAway", "Accessibility Clicker Engine Disconnected.");
-        return super.onUnbind(intent);
-    }
+    public void onInterrupt() {}
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        instance = null; // Clean up the reference if the service is hard closed
+        instance = null;
     }
 }
