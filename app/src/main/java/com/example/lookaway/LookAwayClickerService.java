@@ -25,7 +25,13 @@ public class LookAwayClickerService extends AccessibilityService {
 
     private boolean isAdActive = false;
 
-    public static LookAwayClickerService getInstance() { return instance; }
+    /**
+     * Allows other parts of our app (like the Floating Widget or automation loops)
+     * to safely access the clicker engine.
+     */
+    public static LookAwayClickerService getInstance() {
+        return instance;
+    }
 
     @Override
     protected void onServiceConnected() {
@@ -33,11 +39,17 @@ public class LookAwayClickerService extends AccessibilityService {
         instance = this;
 
         android.accessibilityservice.AccessibilityServiceInfo info = new android.accessibilityservice.AccessibilityServiceInfo();
+
+        // RESTORED: Turn the service's eyes back on so it can monitor screen changes
         info.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
         info.feedbackType = android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_GENERIC;
+        info.flags = android.accessibilityservice.AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
         info.notificationTimeout = 100;
         this.setServiceInfo(info);
 
+        Log.d(TAG, "Accessibility Clicker Engine Connected & Monitoring.");
+
+        // Identify the device's home launcher package to know when we are on the home screen
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_HOME);
         ResolveInfo resolveInfo = getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
@@ -45,13 +57,20 @@ public class LookAwayClickerService extends AccessibilityService {
             homeLauncherPackage = resolveInfo.activityInfo.packageName;
         }
 
-        Intent navIntent = new Intent(this, MainActivity.class);
-        navIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(navIntent);
+        // Auto-Return Logic
+        Intent returnIntent = new Intent(this, MainActivity.class);
+        returnIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(returnIntent);
     }
 
+    /**
+     * Simulates a single finger tap at a specific (x, y) coordinate on the screen.
+     */
     public void clickAtCoordinates(int x, int y) {
-        if (x < 0 || y < 0) return;
+        if (x < 0 || y < 0) {
+            Log.w(TAG, "Invalid click coordinates: (" + x + ", " + y + "). Ignoring.");
+            return;
+        }
         mainHandler.post(() -> {
             try {
                 Path clickPath = new Path();
@@ -72,20 +91,20 @@ public class LookAwayClickerService extends AccessibilityService {
             String currentApp = event.getPackageName() != null ? event.getPackageName().toString() : "";
             String currentClass = event.getClassName() != null ? event.getClassName().toString() : "";
 
-            if (currentApp.equals("com.android.systemui") ||
-                    currentClass.contains("LearningFirewallActivity") ||
-                    currentApp.equals(getPackageName())) return;
+            // Avoid scanning system UI layers or our own application
+            if (currentApp.equals("com.android.systemui") || currentApp.equals(getPackageName())) return;
 
             SharedPreferences prefs = getSharedPreferences("LookAwayPrefs", MODE_PRIVATE);
+            // Verify if automatic reward sensing is enabled in settings
             if (!prefs.getBoolean("is_automatic_mode", false)) return;
 
-            // 1. Identify Zones
+            // 1. Identify current device zone
             Set<String> monitoredApps = prefs.getStringSet("monitored_apps_list", new HashSet<>());
             boolean isGame = monitoredApps.contains(currentApp);
             boolean isHome = currentApp.equals(homeLauncherPackage);
             boolean isPlayStore = currentApp.equals("com.android.vending");
 
-            // 2. Scan Logic (Node Inspection Only)
+            // 2. Scan Logic (Node Tree Inspection)
             boolean isHiddenAd = false;
             AccessibilityNodeInfo root = getRootInActiveWindow();
             if (root != null) {
@@ -93,13 +112,14 @@ public class LookAwayClickerService extends AccessibilityService {
                 root.recycle();
             }
 
-            // 3. State Management
+            // 3. Automation State Management
             if (isHiddenAd) {
                 isAdActive = true;
+                // Kick off the OpenCV background image tracking loops and alert the widget
                 sendBroadcast(new Intent("com.example.lookaway.START_AUTO_SCAN").setPackage(getPackageName()));
                 sendBroadcast(new Intent("com.example.lookaway.VISUAL_AD_CAUGHT").setPackage(getPackageName()));
             }
-            // Only close if we are in a safe zone (Game or Home) and NOT in the Play Store
+            // Turn off scanning if we return to a designated safe zone (the game environment or home launcher)
             else if ((isGame || isHome) && !isPlayStore) {
                 if (isAdActive) {
                     isAdActive = false;
@@ -125,6 +145,13 @@ public class LookAwayClickerService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {}
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        instance = null;
+        Log.d(TAG, "Accessibility Clicker Engine Disconnected.");
+        return super.onUnbind(intent);
+    }
 
     @Override
     public void onDestroy() {
