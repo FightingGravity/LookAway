@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,28 +45,19 @@ public class MainActivity extends AppCompatActivity {
 
     private View toggleLayout;
     private View targetsLayout;
+    private View settingsLayout;
+
     private TextView textToggle;
     private ImageView iconPower;
-    private TextView instructionText; // NEW
+    private TextView instructionText;
+
     private boolean isServiceRunning = false;
     private boolean isWaitingForService = false;
     private Intent pendingProjectionData = null;
 
-    private TextView accuracyLabel;
-    private SeekBar accuracySeekBar;
-    private TextView accuracyWarning;
-
-    private ImageView imgRoiMulti, imgRoiTop, imgRoiBot;
-    private SeekBar roiSeekBar;
-    private TextView roiSliderLabel;
-
-    private SeekBar widgetSizeSeekBar;
-
-    // Tip Jar Variables
     private View btnKofi;
     private TextView textAdsWatched;
 
-    private SharedPreferences prefs;
     private BroadcastReceiver uiStateReceiver;
 
     @Override
@@ -82,51 +72,19 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        // Update ID bindings
         toggleLayout = findViewById(R.id.btn_toggle_overlay);
         targetsLayout = findViewById(R.id.btn_open_targets);
+        settingsLayout = findViewById(R.id.btn_open_settings);
+
         textToggle = findViewById(R.id.text_toggle);
         iconPower = findViewById(R.id.icon_power);
-        instructionText = findViewById(R.id.instruction_text); // NEW
+        instructionText = findViewById(R.id.instruction_text);
 
-        accuracyLabel = findViewById(R.id.accuracy_label);
-        accuracySeekBar = findViewById(R.id.accuracy_seekbar);
-        accuracyWarning = findViewById(R.id.accuracy_warning);
-
-        imgRoiMulti = findViewById(R.id.img_roi_multi);
-        imgRoiTop = findViewById(R.id.img_roi_top);
-        imgRoiBot = findViewById(R.id.img_roi_bot);
-        roiSeekBar = findViewById(R.id.roi_seekbar);
-        roiSliderLabel = findViewById(R.id.roi_slider_label);
-
-        widgetSizeSeekBar = findViewById(R.id.widget_size_seekbar);
-
-        // Bind Tip Jar Views
         btnKofi = findViewById(R.id.btn_kofi);
         textAdsWatched = findViewById(R.id.text_ads_watched);
 
-        prefs = getSharedPreferences("LookAwayPrefs", MODE_PRIVATE);
-
         setupBlurViews();
-
-        int savedAccuracy = prefs.getInt("match_accuracy", 85);
-        accuracySeekBar.setProgress(savedAccuracy);
-        updateAccuracyUI(savedAccuracy);
-
-        int savedRoiMode = prefs.getInt("roi_mode", 0);
-        int savedRoiPercent = prefs.getInt("roi_percent", 15);
-        roiSeekBar.setProgress(savedRoiPercent);
-        updateRoiLabel(savedRoiPercent);
-        updateRoiSelection(savedRoiMode);
-
-        int savedScale = prefs.getInt("widget_scale", 100);
-        if (widgetSizeSeekBar != null) {
-            widgetSizeSeekBar.setProgress(savedScale);
-        }
-
         updateAdStats();
-
-        // --- LISTENERS ---
 
         btnKofi.setOnClickListener(v -> {
             String kofiUrl = "https://ko-fi.com/fightinggravity";
@@ -134,47 +92,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(browserIntent);
         });
 
-        accuracySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                updateAccuracyUI(progress);
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {
-                prefs.edit().putInt("match_accuracy", seekBar.getProgress()).apply();
-            }
+        settingsLayout.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
         });
-
-        roiSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                updateRoiLabel(progress);
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {
-                prefs.edit().putInt("roi_percent", seekBar.getProgress()).apply();
-            }
-        });
-
-        if (widgetSizeSeekBar != null) {
-            widgetSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    Intent intent = new Intent("com.example.lookaway.WIDGET_RESIZE");
-                    intent.putExtra("new_scale", progress);
-                    intent.setPackage(getPackageName());
-                    sendBroadcast(intent);
-                }
-                @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-                @Override public void onStopTrackingTouch(SeekBar seekBar) {
-                    prefs.edit().putInt("widget_scale", seekBar.getProgress()).apply();
-                }
-            });
-        }
-
-        imgRoiMulti.setOnClickListener(v -> updateAndSaveRoiMode(0));
-        imgRoiTop.setOnClickListener(v -> updateAndSaveRoiMode(1));
-        imgRoiBot.setOnClickListener(v -> updateAndSaveRoiMode(2));
 
         toggleLayout.setOnClickListener(v -> {
             if (!isServiceRunning) {
@@ -200,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if ("com.example.lookaway.RESET_UI".equals(intent.getAction())) {
                     resetToggleUI();
-                    updateAdStats(); // Refresh stats when scanner stops
+                    updateAdStats();
                 }
             }
         };
@@ -220,33 +141,14 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Calendar cal = Calendar.getInstance();
 
-        // Loop backwards through the last 7 days and sum up the time
         for (int i = 0; i < 7; i++) {
             String dateKey = "active_time_" + sdf.format(cal.getTime());
             totalMillis += prefs.getLong(dateKey, 0);
             cal.add(Calendar.DAY_OF_YEAR, -1);
         }
 
-        // Convert the total milliseconds to minutes
         long totalMinutesSaved = TimeUnit.MILLISECONDS.toMinutes(totalMillis);
-
         textAdsWatched.setText("LookAway has watched " + totalMinutesSaved + " minutes of ads for you this week.");
-    }
-
-    private void updateRoiLabel(int progress) {
-        int actualPercent = progress + 5;
-        roiSliderLabel.setText("Margin Size: " + actualPercent + "%");
-    }
-
-    private void updateAndSaveRoiMode(int mode) {
-        updateRoiSelection(mode);
-        prefs.edit().putInt("roi_mode", mode).apply();
-    }
-
-    private void updateRoiSelection(int mode) {
-        imgRoiMulti.setSelected(mode == 0);
-        imgRoiTop.setSelected(mode == 1);
-        imgRoiBot.setSelected(mode == 2);
     }
 
     private void setupBlurViews() {
@@ -256,29 +158,28 @@ public class MainActivity extends AppCompatActivity {
         Drawable windowBackground = getWindow().getDecorView().getBackground();
 
         BlurView bannerBlur = findViewById(R.id.banner_container);
-        BlurView roiBlur = findViewById(R.id.roi_container);
         BlurView toggleBlur = findViewById(R.id.widget_control_blur);
         BlurView targetsBlur = findViewById(R.id.targets_control_blur);
-        BlurView tipJarBlur = findViewById(R.id.tip_jar_blur); // NEW
+        BlurView settingsBlur = findViewById(R.id.settings_control_blur);
+        BlurView tipJarBlur = findViewById(R.id.tip_jar_blur);
 
         bannerBlur.setupWith(rootView, new RenderScriptBlur(this)).setFrameClearDrawable(windowBackground).setBlurRadius(blurRadius);
-        roiBlur.setupWith(rootView, new RenderScriptBlur(this)).setFrameClearDrawable(windowBackground).setBlurRadius(blurRadius);
         toggleBlur.setupWith(rootView, new RenderScriptBlur(this)).setFrameClearDrawable(windowBackground).setBlurRadius(blurRadius);
         targetsBlur.setupWith(rootView, new RenderScriptBlur(this)).setFrameClearDrawable(windowBackground).setBlurRadius(blurRadius);
+        settingsBlur.setupWith(rootView, new RenderScriptBlur(this)).setFrameClearDrawable(windowBackground).setBlurRadius(blurRadius);
         tipJarBlur.setupWith(rootView, new RenderScriptBlur(this)).setFrameClearDrawable(windowBackground).setBlurRadius(blurRadius);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateAdStats(); // Refresh stats whenever UI opens
+        updateAdStats();
 
         if (FloatingWidgetService.isRunning) {
-            // Apply ON state styling
             textToggle.setText("DISABLE OVERLAY");
             textToggle.setTextColor(Color.parseColor("#EF4444"));
             iconPower.setColorFilter(Color.parseColor("#EF4444"));
-            instructionText.setVisibility(View.VISIBLE); // Show instructions
+            instructionText.setVisibility(View.VISIBLE);
             isServiceRunning = true;
         } else if (!isWaitingForService) {
             resetToggleUI();
@@ -313,15 +214,6 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
-    }
-
-    private void updateAccuracyUI(int progress) {
-        accuracyLabel.setText("Target Match Required: " + progress + "%");
-        if (progress < 70) {
-            accuracyWarning.setVisibility(View.VISIBLE);
-        } else {
-            accuracyWarning.setVisibility(View.GONE);
-        }
     }
 
     private void requestOverlayPermission() {
@@ -369,11 +261,10 @@ public class MainActivity extends AppCompatActivity {
             startService(serviceIntent);
         }
 
-        // Apply ON state styling
         textToggle.setText("DISABLE OVERLAY");
         textToggle.setTextColor(Color.parseColor("#EF4444"));
         iconPower.setColorFilter(Color.parseColor("#EF4444"));
-        instructionText.setVisibility(View.VISIBLE); // Show instructions
+        instructionText.setVisibility(View.VISIBLE);
         isServiceRunning = true;
     }
 
@@ -383,11 +274,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetToggleUI() {
-        // Apply OFF state styling
         textToggle.setText("ENABLE OVERLAY");
         textToggle.setTextColor(Color.parseColor("#FFFFFF"));
         iconPower.setColorFilter(Color.parseColor("#FFFFFF"));
-        instructionText.setVisibility(View.GONE); // Hide instructions
+        instructionText.setVisibility(View.GONE);
         isServiceRunning = false;
     }
 

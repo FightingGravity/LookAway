@@ -101,7 +101,6 @@ public class FloatingWidgetService extends Service {
 
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private final Runnable autoStopRunnable = this::stopAutomationBrain;
-    private static final long TIMEOUT_DURATION = 45000;
 
     private double currentMatchThreshold = 0.85;
 
@@ -127,6 +126,25 @@ public class FloatingWidgetService extends Service {
             if ("com.example.lookaway.WIDGET_RESIZE".equals(intent.getAction())) {
                 int newScale = intent.getIntExtra("new_scale", 100);
                 applyWidgetScale(newScale);
+            }
+        }
+    };
+
+    // --- NEW: Automation Receiver ---
+    private BroadcastReceiver automationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if ("com.example.lookaway.START_AUTO_SCAN".equals(action)) {
+                if (!isScanning) {
+                    isScanning = true;
+                    startAutomationBrain();
+                }
+            } else if ("com.example.lookaway.STOP_AUTO_SCAN".equals(action)) {
+                if (isScanning) {
+                    isScanning = false;
+                    stopAutomationBrain();
+                }
             }
         }
     };
@@ -306,6 +324,12 @@ public class FloatingWidgetService extends Service {
                 new IntentFilter("com.example.lookaway.WIDGET_RESIZE"),
                 ContextCompat.RECEIVER_NOT_EXPORTED
         );
+
+        // Register the automation trigger listener
+        IntentFilter automationFilter = new IntentFilter();
+        automationFilter.addAction("com.example.lookaway.START_AUTO_SCAN");
+        automationFilter.addAction("com.example.lookaway.STOP_AUTO_SCAN");
+        ContextCompat.registerReceiver(this, automationReceiver, automationFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
 
         acquisitionRunnable = () -> {
             isWaitingForTargetTap = true;
@@ -656,6 +680,8 @@ public class FloatingWidgetService extends Service {
             if (!isScanning) return;
 
             targetTemplates = ImageLibrary.loadTargetTemplates(this);
+
+            // Start the idle timeout countdown
             resetAutoStopTimer();
 
             uiHandler.post(() -> {
@@ -694,7 +720,21 @@ public class FloatingWidgetService extends Service {
 
     private void resetAutoStopTimer() {
         timerHandler.removeCallbacks(autoStopRunnable);
-        timerHandler.postDelayed(autoStopRunnable, TIMEOUT_DURATION);
+
+        SharedPreferences prefs = getSharedPreferences("LookAwayPrefs", MODE_PRIVATE);
+        boolean isAutomatic = prefs.getBoolean("is_automatic_mode", false);
+        long dynamicTimeoutDuration;
+
+        if (isAutomatic) {
+            // Hardcode 3 minutes (180,000 milliseconds) for automatic mode
+            dynamicTimeoutDuration = 180000L;
+        } else {
+            // Pull the user's saved slider setting, defaulting to 30 if null
+            int timeoutSeconds = prefs.getInt("timeout_seconds", 30);
+            dynamicTimeoutDuration = timeoutSeconds * 1000L;
+        }
+
+        timerHandler.postDelayed(autoStopRunnable, dynamicTimeoutDuration);
     }
 
     private void captureAndAnalyzeFrame() {
@@ -794,6 +834,9 @@ public class FloatingWidgetService extends Service {
             triggerSystemClick(clickX, clickY);
             lastClickTime = System.currentTimeMillis();
 
+            // Reset the idle timer because we found a target!
+            resetAutoStopTimer();
+
             TargetRepository repo = new TargetRepository(FloatingWidgetService.this);
             repo.incrementHitCountForTarget(template.id);
             int totalHits = repo.getHitCountForTarget(template.id);
@@ -852,6 +895,10 @@ public class FloatingWidgetService extends Service {
 
         if (resizeReceiver != null) {
             try { unregisterReceiver(resizeReceiver); } catch (Exception e) {}
+        }
+
+        if (automationReceiver != null) {
+            try { unregisterReceiver(automationReceiver); } catch (Exception e) {}
         }
 
         if (mDisplayManager != null && mDisplayListener != null) {
