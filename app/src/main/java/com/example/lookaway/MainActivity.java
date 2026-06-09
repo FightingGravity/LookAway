@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int DRAW_OVER_OTHER_APP_PERMISSION_REQUEST_CODE = 1222;
     private static final int SCREEN_CAPTURE_PERMISSION_REQUEST_CODE = 1333;
     private static final int FGS_PERMISSION_REQUEST_CODE = 1444;
+    private static final int VPN_REQUEST_CODE = 1555;
 
     private View toggleLayout;
     private View targetsLayout;
@@ -86,6 +87,11 @@ public class MainActivity extends AppCompatActivity {
         setupBlurViews();
         updateAdStats();
 
+        SharedPreferences prefs = getSharedPreferences("LookAwayPrefs", MODE_PRIVATE);
+        if (prefs.getBoolean("passive_ad_block", false)) {
+            startVpnIfPrepared();
+        }
+
         btnKofi.setOnClickListener(v -> {
             String kofiUrl = "https://ko-fi.com/fightinggravity";
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(kofiUrl));
@@ -107,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                     requestScreenCapturePermission();
                 }
             } else {
-                stopFloatingWidgetService();
+                stopMasterEngine();
             }
         });
 
@@ -132,6 +138,15 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter("com.example.lookaway.RESET_UI"),
                 ContextCompat.RECEIVER_NOT_EXPORTED
         );
+    }
+
+    private void startVpnIfPrepared() {
+        Intent vpnIntent = android.net.VpnService.prepare(this);
+        if (vpnIntent == null) {
+            startService(new Intent(this, LookAwayVpnService.class));
+        } else {
+            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
+        }
     }
 
     private void updateAdStats() {
@@ -175,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         updateAdStats();
 
-        if (FloatingWidgetService.isRunning) {
+        if (LookAwayMasterEngine.isRunning) {
             textToggle.setText("DISABLE OVERLAY");
             textToggle.setTextColor(Color.parseColor("#EF4444"));
             iconPower.setColorFilter(Color.parseColor("#EF4444"));
@@ -189,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isAccessibilityServiceEnabled() {
         int accessibilityEnabled = 0;
-        final String service = getPackageName() + "/" + LookAwayClickerService.class.getCanonicalName();
+        final String service = getPackageName() + "/" + LookAwayShieldService.class.getCanonicalName();
         try {
             accessibilityEnabled = Settings.Secure.getInt(getApplicationContext().getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
         } catch (Settings.SettingNotFoundException e) {
@@ -246,12 +261,12 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions(permissionsToRequest.toArray(new String[0]), FGS_PERMISSION_REQUEST_CODE);
             return;
         }
-        startFloatingWidgetService(data);
+        startMasterEngine(data);
     }
 
-    private void startFloatingWidgetService(Intent projectionTokenData) {
+    private void startMasterEngine(Intent projectionTokenData) {
         isWaitingForService = true;
-        Intent serviceIntent = new Intent(MainActivity.this, FloatingWidgetService.class);
+        Intent serviceIntent = new Intent(MainActivity.this, LookAwayMasterEngine.class);
         if (projectionTokenData != null) {
             serviceIntent.putExtra("projection_data", projectionTokenData);
         }
@@ -268,8 +283,14 @@ public class MainActivity extends AppCompatActivity {
         isServiceRunning = true;
     }
 
-    private void stopFloatingWidgetService() {
-        stopService(new Intent(MainActivity.this, FloatingWidgetService.class));
+    private void stopMasterEngine() {
+        Intent stopIntent = new Intent(MainActivity.this, LookAwayMasterEngine.class);
+        stopIntent.setAction("ACTION_DISABLE_OVERLAY");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(stopIntent);
+        } else {
+            startService(stopIntent);
+        }
         resetToggleUI();
     }
 
@@ -292,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
             }
-            if (allGranted) startFloatingWidgetService(pendingProjectionData);
+            if (allGranted) startMasterEngine(pendingProjectionData);
         }
     }
 
@@ -306,6 +327,12 @@ public class MainActivity extends AppCompatActivity {
         } else if (requestCode == SCREEN_CAPTURE_PERMISSION_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK && data != null) {
                 checkAndStartService(data);
+            }
+        } else if (requestCode == VPN_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                startService(new Intent(this, LookAwayVpnService.class));
+            } else {
+                getSharedPreferences("LookAwayPrefs", MODE_PRIVATE).edit().putBoolean("is_automatic_mode", false).apply();
             }
         }
     }

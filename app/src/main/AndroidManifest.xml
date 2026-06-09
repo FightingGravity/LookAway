@@ -5,10 +5,12 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
 
     <queries>
         <intent>
@@ -26,6 +28,11 @@
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
         <activity
+            android:name=".InterrogationActivity"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:exported="false" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -36,33 +43,23 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".TargetsActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".SettingsActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".MonitoredAppsActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".BlockedAppsActivity"
-            android:exported="false" />
+        <activity android:name=".TargetsActivity" android:screenOrientation="portrait" />
+        <activity android:name=".SettingsActivity" android:screenOrientation="portrait" />
+        <activity android:name=".MonitoredAppsActivity" android:screenOrientation="portrait" />
+        <activity android:name=".BlockedAppsActivity" android:exported="false" />
 
         <service
-            android:name=".FloatingWidgetService"
+            android:name=".LookAwayMasterEngine"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="mediaProjection">
         </service>
 
         <service
-            android:name=".LookAwayClickerService"
+            android:name=".LookAwayShieldService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="true"
+            android:foregroundServiceType="specialUse"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -70,15 +67,22 @@
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Automation engine for screen monitoring and interaction" />
         </service>
 
         <service
             android:name=".LookAwayVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
+            android:foregroundServiceType="specialUse"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.net.VpnService"/>
             </intent-filter>
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="VPN connection to block ad domains" />
         </service>
 
     </application>

@@ -82,12 +82,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         // --- LOAD AND APPLY SAVED STATES ---
 
-        // Passive Ad Blocking Toggle
-        boolean isPassiveEnabled = prefs.getBoolean("passive_ad_block", false);
-        switchPassiveAdBlock.setChecked(isPassiveEnabled);
-        updateWarningColor(isPassiveEnabled);
-
-        // Timeout Slider Initialization (Restored)
+        // Timeout Slider Initialization
         int currentTimeout = prefs.getInt("timeout_seconds", 30);
         sbTimeout.setProgress((currentTimeout - 15) / 5);
         tvSliderLabel.setText("Automatically stop scanning after " + currentTimeout + " seconds.");
@@ -103,12 +98,6 @@ public class SettingsActivity extends AppCompatActivity {
         updateRoiSelection(prefs.getInt("roi_mode", 0));
 
         widgetSizeSeekBar.setProgress(prefs.getInt("widget_scale", 50));
-
-        // Mode Logic
-        boolean isAutomatic = prefs.getBoolean("is_automatic_mode", false);
-        if (isAutomatic) rbAutomatic.setChecked(true);
-        else rbManual.setChecked(true);
-        toggleUiStates(isAutomatic);
 
         // --- LISTENERS ---
 
@@ -129,10 +118,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        switchPassiveAdBlock.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        // Suppressing the listener briefly during onResume helps prevent accidental looping
+        switchPassiveAdBlock.setOnClickListener(v -> {
+            boolean isChecked = switchPassiveAdBlock.isChecked();
             updateWarningColor(isChecked);
             if (isChecked) {
-                Intent vpnIntent = VpnService.prepare(this);
+                Intent vpnIntent = VpnService.prepare(SettingsActivity.this);
                 if (vpnIntent != null) startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
                 else { startVpnService(); prefs.edit().putBoolean("passive_ad_block", true).apply(); }
             } else {
@@ -159,30 +150,38 @@ public class SettingsActivity extends AppCompatActivity {
         widgetSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar s, int p, boolean b) {
-                // 1. Save it immediately during the slide so it's globally synced in real-time
                 prefs.edit().putInt("widget_scale", p).apply();
-
-                // 2. Fire the broadcast
                 Intent i = new Intent("com.example.lookaway.WIDGET_RESIZE");
                 i.putExtra("new_scale", p);
-
-                // 3. Force the OS to deliver this explicitly to your app
                 i.setPackage(getPackageName());
                 sendBroadcast(i);
             }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar s) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar s) {
-                // Kept empty since we are now saving in real-time above
-            }
+            @Override public void onStartTrackingTouch(SeekBar s) {}
+            @Override public void onStopTrackingTouch(SeekBar s) {}
         });
 
         imgRoiMulti.setOnClickListener(v -> updateAndSaveRoiMode(0));
         imgRoiTop.setOnClickListener(v -> updateAndSaveRoiMode(1));
         imgRoiBot.setOnClickListener(v -> updateAndSaveRoiMode(2));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // 1. Force sync the Automatic Mode toggle based on actual backend data
+        boolean isAutomatic = prefs.getBoolean("is_automatic_mode", false);
+        if (isAutomatic) {
+            rbAutomatic.setChecked(true);
+        } else {
+            rbManual.setChecked(true);
+        }
+        toggleUiStates(isAutomatic);
+
+        // 2. Force sync the Passive Ad Blocking switch based on actual backend data
+        boolean isPassiveEnabled = prefs.getBoolean("passive_ad_block", false);
+        switchPassiveAdBlock.setChecked(isPassiveEnabled);
+        updateWarningColor(isPassiveEnabled);
     }
 
     private void toggleUiStates(boolean isAutomatic) {
@@ -211,6 +210,8 @@ public class SettingsActivity extends AppCompatActivity {
         if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK) {
             startVpnService();
             prefs.edit().putBoolean("passive_ad_block", true).apply();
+            switchPassiveAdBlock.setChecked(true);
+            updateWarningColor(true);
         } else if (requestCode == VPN_REQUEST_CODE) {
             Toast.makeText(this, "VPN Permission Denied.", Toast.LENGTH_SHORT).show();
             switchPassiveAdBlock.setChecked(false);
