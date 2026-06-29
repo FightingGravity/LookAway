@@ -9,7 +9,9 @@
         android:id="@+id/top_nav_blur"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="36dp"
+        android:layout_marginEnd="24dp"
         android:background="@drawable/bg_glass"
         android:clipToOutline="true"
         app:blurOverlayColor="#55000000"
@@ -20,33 +22,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center">
+            android:padding="16dp"
+            android:gravity="center_vertical">
 
-            <LinearLayout
+            <ImageView
                 android:id="@+id/btn_home"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="4dp"
-                android:gravity="center"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_menu_revert"
+                app:tint="#00e5ff"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
-                android:focusable="true">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="HOME"
-                    android:textColor="@color/cyan_glow"
-                    android:textStyle="bold"
-                    android:textSize="14sp"/>
-            </LinearLayout>
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="Targets"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/btn_add"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_weight="1"
-                android:layout_marginHorizontal="4dp"
+                android:layout_marginEnd="16dp"
                 android:gravity="center"
                 android:clickable="true"
                 android:focusable="true">
@@ -61,10 +64,8 @@
 
             <LinearLayout
                 android:id="@+id/btn_delete"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_weight="1"
-                android:layout_marginStart="4dp"
                 android:gravity="center"
                 android:clickable="true"
                 android:focusable="true">

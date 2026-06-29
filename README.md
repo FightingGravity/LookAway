@@ -1,44 +1,118 @@
 # LookAway
+
 ![lookaway_banner.png](app/src/main/res/drawable/lookaway_banner.png)
 
-An intelligent, lightweight Android automation utility with a dual-engine architecture designed to defeat repetitive ads. LookAway can actively monitor your screen to automatically skip ads, or passively kill an app's internet connection entirely so ads never load in the first place.
+LookAway is a personal Android utility for making repetitive mobile ad flows less annoying. It gives you two separate tools:
 
-## 🚀 Dual-Engine Features
+- **ADAM**, short for **Ad Detect and Advance Mode**, watches selected apps for ad flows and taps targets that you personally teach it, such as Next, Skip, and X buttons.
+- **SAM**, short for **Selective Airplane Mode**, can block network access for only the apps you choose while the rest of your phone stays online.
 
-### Engine 1: Active Scanning (Computer Vision)
-* **Intelligent Target Tracking:** Powered by OpenCV, LookAway uses dynamic template matching to scan your screen in real-time to find and "tap" 'Skip', 'X', or 'Next' buttons.
-* **On-the-Fly Acquisition:** Easily capture and crop new skip buttons directly from your screen using the built-in targeting reticle.
-* **Floating Widget:** A sleek, non-intrusive floating control panel that dynamically resizes and lets you toggle the active scanner from anywhere.
-* **Custom Scan Regions (ROI):** Conserve battery and CPU by telling the engine to only scan the top, bottom, or multiple specific regions of your screen.
-* **Adjustable Accuracy:** Fine-tune the match-confidence threshold to prevent false positives.
+LookAway is built for sideloading, transparency, and local control. It is not intended for app-store distribution.
 
-### Engine 2: Passive Shield (Per-App Airplane Mode)
-* **Total Silence Null-Routing:** Uses Android's VpnService to create a local "black hole." Any app added to your blocklist has its network packets instantly dropped, forcing it into a permanent, battery-efficient offline state.
-* **Split-Tunneling Isolation:** LookAway only blocks the apps you choose. The rest of your phone (messages, browsers, other games) stays fully connected to the internet.
-* **Zero External Servers:** The VPN operates 100% locally on your device. Your traffic is never routed to a third-party server or external DNS.
+## What LookAway Does
 
-## 🛠️ Installation
-Because LookAway utilizes advanced system permissions to actively monitor your screen, click on your behalf, and route traffic, it is not available on the Google Play Store.
+ADAM is the floating eye. When enabled, it can detect ad-related screens in apps you monitor, scan the screen locally, match saved button images, and perform the tap gestures needed to advance or close the ad. You can run ADAM automatically or manually.
 
-1. Go to the [Releases](../../releases) page.
-2. Download the latest `app-release.apk`.
-3. Open the file on your Android device and select **Install** (you may need to allow "Install from Unknown Sources" in your browser/file manager settings).
+SAM is the network switch. It uses Android's local VPN interface to drop traffic for selected apps only. It does not connect to a remote VPN server, and it does not route your traffic anywhere else.
 
-## ⚙️ Required Permissions
-Upon launching the app, you will need to grant four core permissions for LookAway to function safely and effectively:
-1. **Display Over Other Apps:** Allows the floating widget and target acquisition crosshairs to hover over your screen.
-2. **Screen Capture API:** Allows the OpenCV engine to take temporary, localized frame snapshots to find your saved targets.
-3. **Accessibility Service:** The core of the active automation. This allows LookAway to physically "tap" the screen when it finds a visual match. *(Note: You will be redirected to your device's Accessibility menu to manually toggle LookAway "On").*
-4. **VPN Configuration:** Required for the Passive Shield. Allows LookAway to create the local tunnel used to drop traffic for your restricted apps. 
+Both tools are optional. You can use ADAM without SAM, SAM without ADAM, both together, or neither until you are ready.
 
-## ☕ Support the Developer
-LookAway is completely free and open-source. If this app has saved you time (and sanity) by defeating ads for you, consider dropping a tip in the jar!
+## Why The Permissions Are Needed
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/fightinggravity)
+LookAway asks for powerful Android permissions because it works across other apps. The app is designed so sensitive work stays on your device.
 
-## 💻 Tech Stack
-* Java / Android SDK
-* OpenCV (Open Source Computer Vision Library)
-* MediaProjection API
-* AccessibilityService API
-* VpnService API
+- **Accessibility Service**: Lets LookAway detect app and ad-window changes, open or close ADAM at the right time, and perform tap gestures that you configure.
+- **Screen Capture**: Gives ADAM temporary frames to scan while the eye is open. Frames are processed locally for target matching.
+- **Display Over Other Apps**: Shows the floating eye, target reticle, tutorial overlays, and tap feedback.
+- **VPN Configuration**: Lets SAM create a local on-device VPN slot so selected app traffic can be blocked without a remote server.
+- **Notifications**: Keeps foreground services visible while they are active.
+- **Vibration**: Lets ADAM give a small pulse when it automatically finishes looking.
+- **Media Volume Control**: Lets ADAM mute and restore media audio while scanning, if you enable that setting.
+
+LookAway does not upload screen frames, target images, accessibility data, or VPN traffic.
+
+## How ADAM Works
+
+ADAM is trained by you. When you find a button it should tap, long-press the floating eye, frame the target with the reticle, and save it. ADAM stores that target on the device and uses OpenCV template matching to find it later.
+
+The normal flow looks like this:
+
+1. You choose which apps ADAM should monitor.
+2. ADAM opens its eye when it sees a known ad trigger, or when you open it manually.
+3. ADAM scans only while the eye is open.
+4. If a saved target is found, ADAM taps it.
+5. If an ad redirects to Google Play, Samsung, or a browser, LookAway can return to the ad flow and keep scanning.
+6. When LookAway sees the app return to normal gameplay, ADAM closes its eye.
+
+If an ad uses a new screen type, the Trigger Manager lets you decide whether that screen should open ADAM, be ignored, or be reviewed later.
+
+## How SAM Works
+
+SAM is a per-app offline mode. Instead of putting the whole phone into airplane mode, SAM blocks network traffic only for apps you select.
+
+This is done through Android's `VpnService`, but LookAway is not a VPN provider. There is no remote endpoint. SAM uses the local VPN interface as an Android-approved way to filter selected app traffic on the device.
+
+## First Run
+
+LookAway includes an onboarding tutorial for new users. It walks through the permissions, explains what each one is for, helps you choose apps for SAM and ADAM, and includes a target-practice screen so you can teach ADAM its first buttons before trying it in a real app.
+
+The home screen also includes:
+
+- **INFO**: A plain-language explanation of what LookAway does and what its permissions mean.
+- **TUTORIAL**: A replay button for onboarding.
+
+## Suggested Setup
+
+Start small:
+
+1. Install LookAway and complete onboarding.
+2. Pick one game or app to test first.
+3. Enable ADAM for that app.
+4. Leave ADAM in Automatic Mode unless you prefer to open the eye yourself.
+5. Teach ADAM a few common targets, such as Next, Skip, and X.
+6. Use the Trigger Manager if an ad does not open ADAM automatically.
+7. Add SAM only for apps where you want selective offline behavior.
+
+You can tune scan area, match sensitivity, widget size, ad-complete vibration, and media mute behavior from Settings.
+
+## Installation
+
+LookAway is distributed for sideloading.
+
+1. Open the repository's **Releases** page.
+2. Download the latest APK.
+3. Open the APK on your Android device.
+4. Allow install from unknown sources if Android asks.
+5. Launch LookAway and follow onboarding.
+
+## Building From Source
+
+Open the project in Android Studio, or build from PowerShell:
+
+```powershell
+$env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
+.\gradlew.bat :app:assembleDebug
+```
+
+Install a debug build to a connected Android device:
+
+```powershell
+$env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
+.\gradlew.bat :app:installDebug
+```
+
+## Tech Stack
+
+- Java / Android SDK
+- OpenCV
+- MediaProjection API
+- AccessibilityService
+- VpnService
+- Foreground services
+- BlurView UI effects
+
+## Project Status
+
+LookAway is a personal, open-source Android project. Mobile ads, games, storefront redirects, and Android behavior can change over time, so some ad flows may need new targets or trigger rules.
+
+If LookAway saves you time, the in-app Ko-fi link is available from the home screen.

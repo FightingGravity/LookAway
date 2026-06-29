@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.lookaway">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <queries>
         <intent>
@@ -19,6 +16,7 @@
         </intent>
     </queries>
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -27,9 +25,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
+        <activity android:name=".InfoActivity" />
         <activity
             android:name=".InterrogationActivity"
-            android:theme="@style/Theme.AppCompat.Dialog"
+            android:theme="@style/Theme.TriageModal"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="singleInstance"
             android:exported="false" />
 
         <activity
@@ -47,6 +49,18 @@
         <activity android:name=".SettingsActivity" android:screenOrientation="portrait" />
         <activity android:name=".MonitoredAppsActivity" android:screenOrientation="portrait" />
         <activity android:name=".BlockedAppsActivity" android:exported="false" />
+        <activity
+            android:name=".TargetPracticeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".TriggerClassesActivity" android:exported="false" />
+
+        <activity
+            android:name=".LookAwayPermissionProxyActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
 
         <service
             android:name=".LookAwayMasterEngine"
@@ -69,7 +83,7 @@
                 android:resource="@xml/accessibility_service_config" />
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Automation engine for screen monitoring and interaction" />
+                android:value="On-device ad scanning and user-configured tap gestures" />
         </service>
 
         <service
@@ -82,7 +96,7 @@
             </intent-filter>
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="VPN connection to block ad domains" />
+                android:value="Local VPN interface for user-selected app traffic blocking" />
         </service>
 
     </application>

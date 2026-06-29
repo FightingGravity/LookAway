@@ -21,16 +21,16 @@ import java.util.Set;
 
 public class LookAwayVpnService extends VpnService implements Runnable {
 
-    private static final String TAG = "LookAway-DNS";
+    private static final String TAG = "LookAway-SAM";
     private Thread vpnThread;
     private ParcelFileDescriptor vpnInterface;
 
     private FileInputStream in;
     private FileOutputStream out;
 
-    // --- SHARED NOTIFICATION VARIABLES ---
-    private static final String CHANNEL_ID = "LookAway_Scanner_Channel";
-    private static final int NOTIFICATION_ID = 9911;
+    // Local VPN configuration for user-selected apps.
+    private static final String CHANNEL_ID = "LookAway_SAM_Channel";
+    private static final int NOTIFICATION_ID = 9912;
 
     @Override
     public void onCreate() {
@@ -40,33 +40,35 @@ public class LookAwayVpnService extends VpnService implements Runnable {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Intercept shutdown commands before performing initialization
         if (intent != null && "STOP_VPN".equals(intent.getAction())) {
             stopVpn();
             return START_NOT_STICKY;
         }
 
-        // Build the final notification instantly and feed it directly to the system
         Notification finalNotification = buildDynamicNotification();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIFICATION_ID, finalNotification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
-        } else {
+        try {
             startForeground(NOTIFICATION_ID, finalNotification);
+        } catch (Exception e) {
+            Log.w("LookAway", "Foreground notification start failed. Posting fallback notification.");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.notify(NOTIFICATION_ID, finalNotification);
+            }
         }
 
         if (vpnThread == null || !vpnThread.isAlive()) {
             vpnThread = new Thread(this, "LookAwayVpnThread");
             vpnThread.start();
         }
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
     public void run() {
         try {
             if (setupVpn()) {
-                Log.i(TAG, "Per-App Airplane Mode Active. Silently killing all traffic for selected apps.");
+                Log.i(TAG, "SAM active. Dropping network traffic for selected apps locally.");
                 in = new FileInputStream(vpnInterface.getFileDescriptor());
                 out = new FileOutputStream(vpnInterface.getFileDescriptor());
                 byte[] packet = new byte[32767];
@@ -77,7 +79,14 @@ public class LookAwayVpnService extends VpnService implements Runnable {
                     if (length > 0) {
                         dropCount++;
                         if (dropCount % 100 == 0) {
-                            Log.v(TAG, "Silently dropped " + dropCount + " packets.");
+                            Log.v(TAG, "Dropped " + dropCount + " selected-app packets locally.");
+                        }
+                    } else {
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            Log.i(TAG, "SAM VPN thread interrupted. Shutting down.");
+                            break;
                         }
                     }
                 }
@@ -107,12 +116,13 @@ public class LookAwayVpnService extends VpnService implements Runnable {
 
         if (vpnBlockedApps.isEmpty()) return false;
 
+        // SAM routes only user-selected apps into this local VPN interface and drops packets locally.
         PackageManager pm = getPackageManager();
         for (String packageName : vpnBlockedApps) {
             try {
                 pm.getPackageInfo(packageName, 0);
                 b.addAllowedApplication(packageName);
-                Log.i(TAG, "Total Silence active for: " + packageName);
+                Log.i(TAG, "SAM selected app: " + packageName);
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
         try { return (vpnInterface = b.establish()) != null; } catch (Exception e) { return false; }
@@ -122,12 +132,19 @@ public class LookAwayVpnService extends VpnService implements Runnable {
         if (vpnThread != null) { vpnThread.interrupt(); vpnThread = null; }
         try { if (vpnInterface != null) vpnInterface.close(); } catch (Exception ignored) {}
 
-        // Smart Shutdown: Only clear the notification layout if the visual engine is also dead
-        if (!LookAwayMasterEngine.isRunning) {
-            stopForeground(true);
-        } else {
-            stopForeground(false);
+        getSharedPreferences("LookAwayPrefs", MODE_PRIVATE).edit().putBoolean("passive_ad_block", false).apply();
+
+        Intent uiIntent = new Intent("com.example.lookaway.RESET_UI");
+        uiIntent.setPackage(getPackageName());
+        sendBroadcast(uiIntent);
+
+        stopForeground(true);
+
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.cancel(NOTIFICATION_ID);
         }
+
         stopSelf();
     }
 
@@ -137,10 +154,9 @@ public class LookAwayVpnService extends VpnService implements Runnable {
         stopVpn();
     }
 
-    // --- SHARED NOTIFICATION BUILDER LOGIC ---
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, "LookAway Master Engine", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel serviceChannel = new NotificationChannel(CHANNEL_ID, "Selective Airplane Mode", NotificationManager.IMPORTANCE_LOW);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(serviceChannel);
@@ -149,34 +165,19 @@ public class LookAwayVpnService extends VpnService implements Runnable {
     }
 
     private Notification buildDynamicNotification() {
-        SharedPreferences prefs = getSharedPreferences("LookAwayPrefs", MODE_PRIVATE);
-
-        // If this service execution path is hit, the VPN status is active
-        boolean isVpnActive = prefs.getBoolean("passive_ad_block", false);
-        // Safely extract the Master Engine runtime state via internal boolean flag
-        boolean isOverlayActive = LookAwayMasterEngine.isRunning;
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("LookAway Control Center")
-                .setContentText("Active background systems:")
+                .setContentTitle("Selective Airplane Mode")
+                .setContentText("SAM is blocking all internet traffic for your selected apps.")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setGroup("SAM_EXPLICIT_ISOLATION")
                 .setOngoing(true);
 
-        // Map button targets straight to the core Master Engine processing routines
-        if (isOverlayActive) {
-            Intent disableOverlayIntent = new Intent(this, LookAwayMasterEngine.class);
-            disableOverlayIntent.setAction("ACTION_DISABLE_OVERLAY");
-            PendingIntent piOverlay = PendingIntent.getService(this, 2, disableOverlayIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.addAction(R.drawable.ic_notification, "Stop Overlay", piOverlay);
-        }
-
-        if (isVpnActive) {
-            Intent disableVpnIntent = new Intent(this, LookAwayMasterEngine.class);
-            disableVpnIntent.setAction("ACTION_DISABLE_VPN");
-            PendingIntent piVpn = PendingIntent.getService(this, 3, disableVpnIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.addAction(R.drawable.ic_notification, "Stop Ad Block", piVpn);
-        }
+        Intent disableVpnIntent = new Intent(this, LookAwayVpnService.class);
+        disableVpnIntent.setAction("STOP_VPN");
+        PendingIntent piVpn = PendingIntent.getService(this, 3, disableVpnIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.addAction(R.drawable.ic_notification, "Disable SAM", piVpn);
 
         return builder.build();
     }

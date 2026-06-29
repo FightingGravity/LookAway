@@ -5,6 +5,70 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_data_stream">
 
+    <LinearLayout
+        android:id="@+id/btn_info_page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="8dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@android:drawable/ic_dialog_info"
+            app:tint="#F59E0B" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="INFO"
+            android:textColor="#F59E0B"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/btn_replay_tutorial_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="8dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/outline_abc_24"
+            app:tint="#10B981" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TUTORIAL"
+            android:textColor="#10B981"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:layout_marginTop="-14dp" />
+    </LinearLayout>
+
     <eightbitlab.com.blurview.BlurView
         android:id="@+id/banner_container"
         android:layout_width="match_parent"
@@ -25,6 +89,7 @@
             android:src="@drawable/lookaway_banner" />
     </eightbitlab.com.blurview.BlurView>
 
+    <!-- 1. ADAM CONTROL -->
     <eightbitlab.com.blurview.BlurView
         android:id="@+id/widget_control_blur"
         android:layout_width="match_parent"
@@ -36,13 +101,22 @@
         android:clipToOutline="true"
         app:blurOverlayColor="#00000000"
         app:layout_constraintTop_toBottomOf="@id/banner_container"
-        app:layout_constraintBottom_toTopOf="@id/targets_control_blur">
+        app:layout_constraintBottom_toTopOf="@id/sam_control_blur">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="4dp">
+
+            <TextView
+                android:id="@+id/title_adam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="12dp"
+                android:textColor="#00e5ff"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/btn_toggle_overlay"
@@ -52,7 +126,8 @@
                 android:orientation="horizontal"
                 android:clickable="true"
                 android:focusable="true"
-                android:paddingVertical="16dp">
+                android:paddingTop="12dp"
+                android:paddingBottom="16dp">
 
                 <ImageView
                     android:id="@+id/icon_power"
@@ -65,28 +140,78 @@
                     android:id="@+id/text_toggle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ENABLE OVERLAY"
+                    android:text="Enable ADAM"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:textSize="18sp"
                     android:layout_marginStart="12dp"/>
             </LinearLayout>
 
+        </LinearLayout>
+    </eightbitlab.com.blurview.BlurView>
+
+    <!-- 2. SAM CONTROL -->
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/sam_control_blur"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_glass"
+        android:clipToOutline="true"
+        app:blurOverlayColor="#00000000"
+        app:layout_constraintTop_toBottomOf="@id/widget_control_blur"
+        app:layout_constraintBottom_toTopOf="@id/targets_control_blur">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="4dp">
+
             <TextView
-                android:id="@+id/instruction_text"
+                android:id="@+id/title_sam"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tap widget to begin scanning.\nShort press widget for target acquisition.\nLong press to reposition widget."
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"
                 android:gravity="center"
-                android:visibility="gone"
-                android:layout_marginBottom="8dp"
-                android:layout_marginHorizontal="8dp" />
+                android:paddingTop="12dp"
+                android:textColor="#00e5ff"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/btn_toggle_sam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/icon_sam_power"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_power"
+                    app:tint="#FFFFFF"/>
+
+                <TextView
+                    android:id="@+id/text_sam_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enable SAM"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_marginStart="12dp"/>
+            </LinearLayout>
 
         </LinearLayout>
     </eightbitlab.com.blurview.BlurView>
 
+    <!-- 3. TARGETS CONTROL -->
     <eightbitlab.com.blurview.BlurView
         android:id="@+id/targets_control_blur"
         android:layout_width="match_parent"
@@ -97,7 +222,7 @@
         android:background="@drawable/bg_glass"
         android:clipToOutline="true"
         app:blurOverlayColor="#00000000"
-        app:layout_constraintTop_toBottomOf="@id/widget_control_blur"
+        app:layout_constraintTop_toBottomOf="@id/sam_control_blur"
         app:layout_constraintBottom_toTopOf="@id/settings_control_blur">
 
         <LinearLayout
@@ -134,6 +259,7 @@
         </LinearLayout>
     </eightbitlab.com.blurview.BlurView>
 
+    <!-- 4. SETTINGS CONTROL -->
     <eightbitlab.com.blurview.BlurView
         android:id="@+id/settings_control_blur"
         android:layout_width="match_parent"

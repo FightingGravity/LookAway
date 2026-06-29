@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+
+    <!-- Rest at Center -->
+    <item android:drawable="@drawable/pupil_0" android:duration="60" />
+
+    <!-- Smooth sweep to Positive (Right) -->
+    <item android:drawable="@drawable/pupil_p1" android:duration="60" />
+    <item android:drawable="@drawable/pupil_p2" android:duration="60" />
+    <!-- Hold at the edge -->
+    <item android:drawable="@drawable/pupil_p3" android:duration="400" />
+
+    <!-- Smooth return to Center -->
+    <item android:drawable="@drawable/pupil_p2" android:duration="60" />
+    <item android:drawable="@drawable/pupil_p1" android:duration="60" />
+    <item android:drawable="@drawable/pupil_0" android:duration="60" />
+
+    <!-- Smooth sweep to Minus (Left) -->
+    <item android:drawable="@drawable/pupil_m1" android:duration="60" />
+    <item android:drawable="@drawable/pupil_m2" android:duration="60" />
+    <!-- Hold at the edge -->
+    <item android:drawable="@drawable/pupil_m3" android:duration="400" />
+
+    <!-- Smooth return to Center -->
+    <item android:drawable="@drawable/pupil_m2" android:duration="60" />
+    <item android:drawable="@drawable/pupil_m1" android:duration="60" />
+
+</animation-list>

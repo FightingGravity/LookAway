@@ -1,15 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/widget_glass_base"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_frosted_glass" />
+
+    <ImageView
+        android:id="@+id/widget_background"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:src="@drawable/backgroundonly" />
+
+    <ImageView
+        android:id="@+id/pupil_layer"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:alpha="0" />
 
     <ImageView
         android:id="@+id/play_stop_btn"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:padding="8dp"
-        android:src="@drawable/ic_eye_closed"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
         android:scaleType="fitCenter"
-        android:elevation="8dp" />
+        android:src="@drawable/ic_eye_closed" />
 
 </FrameLayout>

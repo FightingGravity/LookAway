@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_data_stream">
+
+    <!-- Bumping down 48dp to clear the notification tray/notch -->
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/info_blur_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/bg_glass_info"
+        android:clipToOutline="true"
+        app:blurOverlayColor="#00000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- HEADER -->
+            <LinearLayout
+                android:id="@+id/header_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:id="@+id/btn_back_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@android:drawable/ic_menu_revert"
+                        app:tint="#F59E0B" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BACK"
+                        android:textColor="#F59E0B"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="System Information"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- WELCOME PARAGRAPH -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="16dp"
+                        android:text="Welcome to LookAway. This app is designed to watch and advance ads in mobile games, or hide them altogether. It operates using two highly specialized, independent engines working in tandem to identify, target, and neutralize intrusive mobile advertising."
+                        android:textColor="#D1D5DB"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp" />
+
+                    <!-- CUSTOM TAB BAR -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:layout_marginTop="8dp"
+                        android:background="#1AFFFFFF">
+
+                        <TextView
+                            android:id="@+id/tab_adam"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:text="ADAM"
+                            android:textColor="#F59E0B"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:id="@+id/tab_sam"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:text="SAM"
+                            android:textColor="#9CA3AF"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:id="@+id/tab_faq"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:text="FAQ"
+                            android:textColor="#9CA3AF"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"/>
+                    </LinearLayout>
+
+                    <!-- TAB UNDERLINE INDICATORS -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+                        <View android:id="@+id/line_adam" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#F59E0B" />
+                        <View android:id="@+id/line_sam" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#00000000" />
+                        <View android:id="@+id/line_faq" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="#00000000" />
+                    </LinearLayout>
+
+                    <!-- CONTENT: ADAM -->
+
+                    <LinearLayout
+                        android:id="@+id/content_adam"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ad Detect and Advance Mode"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#D1D5DB"
+                            android:textSize="14sp"
+                            android:lineSpacingExtra="4dp"
+                            android:layout_marginBottom="16dp"
+                            android:text="ADAM is your tool for automatically tapping those tiny, hidden 'X' and 'Skip' buttons in ads. It lives on your screen as a floating eye widget.\n\nIn Manual Mode, ADAM only opens its eye when you physically tap it. In Automatic Mode, it wakes up the exact moment a known ad trigger is sensed. Once the eye is open, ADAM takes a screenshot every second to hunt for your registered targets. As soon as it spots a match, ADAM taps it for you. When it senses that you have returned to your game, the eye closes and awaits the next trigger."/>
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Target Information"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#D1D5DB"
+                            android:textSize="14sp"
+                            android:lineSpacingExtra="4dp"
+                            android:layout_marginBottom="16dp"
+                            android:text="Targets are the visual cues you teach ADAM to look for. Because ad networks constantly change the shape, color, and size of their skip buttons, we can't just add a library for ADAM to pick from; you must teach it.\n\nWhen you see a target that ADAM doesn't know, tap and hold the widget for 1 second and it will go into targeting mode. Tip: make the target as small as possible without cutting off anything important. ADAM saves these cropped images as your personal target library. While its eye is open, ADAM uses image processing to compare your live screen against this library. When it finds a perfect visual match, it knows exactly where to tap."/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Trigger Information"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#D1D5DB"
+                            android:textSize="14sp"
+                            android:lineSpacingExtra="4dp"
+                            android:text="Triggers are the invisible background signals that tell ADAM when an ad has launched. LookAway has some of the large ad companies hardcoded in, but over time you will need to teach ADAM which triggers can be ignored and which are ads. You do this, while in automatic mode, by tapping to open the eye after an ad starts that ADAM didn't recognize as an ad. You will then receive a notification with a list of triggers. You can usually tell which one is the ad class, but sometimes ADAM will help out by highlighting likely ones in yellow. You can tap ignore for things that don't appear to be ads. Once submitted, that ad will automatically open ADAM's eye next time. These triggers can be swapped, deleted, and checked from the Manage Triggers menu.\n\nSaving a class as a Trigger tells ADAM, 'This is an ad network - wake up and start scanning.' Saving it as an Ignore tells ADAM to keep his eye closed."/>
+                    </LinearLayout>
+
+                    <!-- CONTENT: SAM -->
+                    <LinearLayout
+                        android:id="@+id/content_sam"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Selective Airplane Mode"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#D1D5DB"
+                            android:textSize="14sp"
+                            android:lineSpacingExtra="4dp"
+                            android:text="SAM's function is in the name. If you have ever wanted to play a game in airplane mode but still send and receive texts at the same time, you can now.\n\nSAM uses Android VPN to route traffic from selected apps into a local on-device interface, where those packets are dropped instead of sent over the network.\n\nThe apps you select in the Settings menu are the only apps this is done for.\n\nDisable SAM at any time from the LookAway home screen or your notifications bar."/>
+                    </LinearLayout>
+
+                    <!-- CONTENT: FAQ -->
+                    <LinearLayout
+                        android:id="@+id/content_faq"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="How much battery drain should I expect from LookAway?"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#D1D5DB"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="16dp"
+                            android:text="Very little, if your settings are optimized.\n\nSAM: Uses virtually zero battery. It routes data locally in the background, so you won't even notice it's on.\n\nADAM: Only uses battery during the few seconds it takes to scan an active ad. You can drastically reduce its battery use by shrinking its scan area in the Settings menu.\n\nThe benchmark: If you are playing a game that shows ads every few minutes, LookAway will use roughly 1/3 of the battery the game itself is using."/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="What happens to my screen data when ADAM is scanning?"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#D1D5DB"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="16dp"
+                            android:text="ADAM processes everything locally on your device. While the eye is open, it checks a momentary screen frame against your saved target images. Frames are not saved by LookAway, and LookAway does not transmit, upload, or collect screen data over the internet."/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Why can't I see all of my notification details while ADAM is enabled?"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#D1D5DB"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="16dp"
+                            android:text="Android may hide notification previews while ADAM is enabled because screen capture permission is active. This is Android protecting private notification content from being captured. SAM does not use screen capture, so SAM by itself should not affect notification previews."/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Why do you need Accessibility permissions?"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#D1D5DB"
+                            android:textSize="14sp"
+                            android:text="ADAM uses Accessibility to detect app and ad window changes, open its scanner in automatic mode, and perform tap gestures you configure. LookAway does not request window content access and does not transmit Accessibility data."/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+    </eightbitlab.com.blurview.BlurView>
+</androidx.constraintlayout.widget.ConstraintLayout>

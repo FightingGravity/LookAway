@@ -4,15 +4,17 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@android:color/transparent"
-    android:padding="16dp">
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="24dp">
 
     <LinearLayout
+        android:id="@+id/interrogation_blur_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#E6111827"
-        android:padding="20dp"
-        android:elevation="8dp">
+        android:background="@drawable/bg_glass"
+        android:clipToOutline="true"
+        android:padding="20dp">
 
         <View
             android:layout_width="40dp"
@@ -25,23 +27,34 @@
             android:id="@+id/text_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="LookAway Interrogation Engine"
+            android:text="LookAway Triage Center"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Isolate missed ad triggers captured in the memory window buffer."
-            android:textColor="#9CA3AF"
-            android:textSize="14sp"
-            android:layout_marginBottom="16dp" />
+            android:text="Isolate missed ad triggers captured in the memory window buffer. Yellow text indicates a suspected ad network."
+            android:textColor="#AAAAAA"
+            android:textSize="12sp"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btn_ignore_all"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:text="Ignore All Unknowns"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:backgroundTint="#374151"
+            android:layout_marginBottom="12dp" />
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginBottom="16dp">
 
             <LinearLayout
@@ -62,9 +75,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
                 android:text="Dismiss"
                 android:textColor="#FFFFFF"
+                android:textStyle="bold"
                 android:backgroundTint="#374151" />
 
             <Button
@@ -72,10 +86,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
                 android:text="Commit Changes"
-                android:textColor="#111827"
+                android:textColor="#000000"
                 android:textStyle="bold"
-                android:backgroundTint="#06B6D4" /> </LinearLayout>
+                android:backgroundTint="#00e5ff" />
+        </LinearLayout>
+
     </LinearLayout>
+
 </LinearLayout>

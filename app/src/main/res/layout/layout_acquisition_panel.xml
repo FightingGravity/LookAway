@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#88000000">
+    android:background="@android:color/transparent">
 
     <View
         android:id="@+id/reticle_box"
@@ -14,30 +14,51 @@
         android:id="@+id/control_panel_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#333333"
+        android:background="#1E1E1E"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Target Acquisition"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.02" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Drag the box to frame the target, then save."
+            android:textColor="#888888"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="20dp" />
 
         <EditText
             android:id="@+id/target_name_input"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter Target Name"
-            android:textColorHint="#AAAAAA"
+            android:layout_height="54dp"
+            android:background="#2A2A2A"
+            android:hint="Enter target name..."
+            android:textColorHint="#666666"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#FFFFFF"
-            android:inputType="text"
-            android:layout_marginBottom="12dp"/>
+            android:paddingHorizontal="16dp"
+            android:textSize="16sp"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:layout_marginBottom="24dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Slide to change box size"
-            android:textColor="#DDDDDD"
-            android:textSize="14sp"
+            android:text="ADJUST CROP SIZE"
+            android:textColor="#AAAAAA"
+            android:textSize="12sp"
             android:textStyle="bold"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="4dp" />
+            android:layout_marginBottom="8dp" />
 
         <SeekBar
             android:id="@+id/crop_slider"
@@ -45,43 +66,39 @@
             android:layout_height="wrap_content"
             android:max="256"
             android:progress="64"
-            android:progressTint="#00e5ff"
-            android:thumbTint="#00e5ff"
-            android:layout_marginBottom="4dp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Drag box to reposition."
-            android:textColor="#AAAAAA"
-            android:textSize="12sp"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="16dp" />
+            android:progressTint="#06B6D4"
+            android:thumbTint="#06B6D4"
+            android:layout_marginBottom="32dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <Button
                 android:id="@+id/btn_cancel_crop"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:layout_weight="1"
                 android:text="Cancel"
-                android:backgroundTint="#888888"
-                android:textColor="#FFFFFF"/>
-
-            <View android:layout_width="16dp" android:layout_height="match_parent"/>
+                android:backgroundTint="#2A2A2A"
+                android:textColor="#FF5252"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="8dp"/>
 
             <Button
                 android:id="@+id/btn_save_crop"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:layout_weight="1"
-                android:text="Save"
-                android:backgroundTint="#00e5ff"
-                android:textColor="#FFFFFF"/>
+                android:text="Save Target"
+                android:backgroundTint="#10B981"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp"/>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

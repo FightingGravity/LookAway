@@ -2,5 +2,5 @@
 <resources>
     <string name="app_name">LookAway</string>
 
-    <string name="accessibility_service_description">LookAway automation engine for simulating automated clicks during active routines.</string>
+    <string name="accessibility_service_description">LookAway uses Accessibility to detect window changes and perform taps you configure.</string>
 </resources>

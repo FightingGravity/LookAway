@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settings_scroll"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,9 +12,8 @@
         android:layout_height="wrap_content"
         android:paddingBottom="48dp">
 
-        <!-- PANE 1: REWARDED AD SENSING -->
         <eightbitlab.com.blurview.BlurView
-            android:id="@+id/settings_blur"
+            android:id="@+id/settings_main_blur"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -30,24 +30,44 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
+                <LinearLayout
+                    android:id="@+id/settings_header_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingBottom="16dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/btn_back_settings"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@android:drawable/ic_menu_revert"
+                        app:tint="#00e5ff"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Settings"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- SECTION 1: ADAM MANAGEMENT -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rewarded Ad Sensing"
+                    android:text="ADAM Management"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:layout_gravity="center_horizontal"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="LookAway will only automatically monitor in the selected applications."
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="24dp"
-                    android:textAlignment="center"/>
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp"/>
 
                 <RadioGroup
                     android:id="@+id/rg_mode_selector"
@@ -63,29 +83,41 @@
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:textStyle="bold"
+                        android:checked="true"
                         android:buttonTint="#00e5ff" />
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:text="ADAM's eye opens when a trigger is sensed. ADAM will only monitor in the selected apps."
+                        android:textColor="#AAAAAA"
+                        android:textSize="12sp"
                         android:layout_marginStart="32dp"
-                        android:layout_marginTop="8dp">
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="16dp"
+                        android:textAlignment="textStart"/>
 
-                        <androidx.appcompat.widget.AppCompatButton
-                            android:id="@+id/btn_monitored_apps"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_cyan_rounded"
-                            android:text="Select Monitored Apps"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            android:textSize="14sp"/>
-                    </LinearLayout>
-
-                    <Space
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btn_monitored_apps"
                         android:layout_width="match_parent"
-                        android:layout_height="24dp" />
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_cyan_rounded"
+                        android:text="Select Monitored Apps"
+                        android:textColor="#000000"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btn_trigger_classes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_cyan_rounded"
+                        android:text="Manage Triggers"
+                        android:textColor="#000000"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="12dp"/>
 
                     <RadioButton
                         android:id="@+id/rb_manual"
@@ -97,23 +129,35 @@
                         android:textStyle="bold"
                         android:buttonTint="#00e5ff" />
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ADAM's eye opens when you tap it."
+                        android:textColor="#AAAAAA"
+                        android:textSize="12sp"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="16dp"
+                        android:textAlignment="textStart"/>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_marginStart="32dp"
-                        android:layout_marginTop="12dp">
+                        android:layout_marginTop="8dp">
 
                         <TextView
                             android:id="@+id/tv_slider_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Automatically stop scanning after 30 seconds."
+                            android:text="ADAM's eye closes after 30 seconds."
                             android:textColor="#FFFFFF"
                             android:textSize="14sp"
                             android:layout_gravity="start"
                             android:layout_marginBottom="8dp"/>
 
+                        <!-- THE MISSING SEEKBAR HAS BEEN RESTORED -->
                         <SeekBar
                             android:id="@+id/sb_timeout"
                             android:layout_width="match_parent"
@@ -122,103 +166,146 @@
                             android:progress="3"
                             android:progressTint="#00e5ff"
                             android:thumbTint="#00e5ff" />
+
                     </LinearLayout>
-                </RadioGroup>
-            </LinearLayout>
-        </eightbitlab.com.blurview.BlurView>
+                </RadioGroup> <!-- RADIO GROUP SAFELY CLOSED HERE -->
 
-        <!-- PANE 2: AD BLOCKING -->
-        <eightbitlab.com.blurview.BlurView
-            android:id="@+id/ad_blocking_blur"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_glass"
-            android:clipToOutline="true"
-            app:blurOverlayColor="#00000000"
-            app:layout_constraintTop_toBottomOf="@id/settings_blur">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#44FFFFFF"
+                    android:layout_marginVertical="24dp"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="24dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingEnd="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ad Complete Vibrate"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="ADAM lets you know when it is done looking."
+                            android:textColor="#AAAAAA"
+                            android:textSize="12sp"/>
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sw_auto_close_vibration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        app:thumbTint="@color/switch_thumb"
+                        app:trackTint="@color/switch_track"/>
+                </LinearLayout>
 
                 <TextView
+                    android:id="@+id/vibration_intensity_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ad Blocking"
+                    android:text="Vibration Strength: 180"
                     android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center_horizontal"/>
-
-                <TextView
-                    android:id="@+id/tv_passive_ad_block_desc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="LookAway will block ads within the selected applications. The selected applications will function as if they are in airplane mode."
-                    android:textColor="#AAAAAA"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="24dp"
-                    android:textAlignment="center"/>
-
-                <Switch
-                    android:id="@+id/switch_passive_ad_block"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Passive Ad Blocking"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="16dp"
-                    android:thumbTint="@color/switch_thumb"
-                    android:trackTint="@color/switch_track" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_blocked_apps"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_cyan_rounded"
-                    android:text="Select Ad-Blocked Apps"
-                    android:textColor="#000000"
-                    android:textStyle="bold"
                     android:textSize="14sp"
-                    android:layout_marginBottom="12dp"/>
+                    android:textStyle="bold"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="8dp"/>
 
-            </LinearLayout>
-        </eightbitlab.com.blurview.BlurView>
+                <SeekBar
+                    android:id="@+id/vibration_intensity_seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:min="45"
+                    android:max="300"
+                    android:progress="180"
+                    android:progressTint="#00e5ff"
+                    android:thumbTint="#00e5ff"
+                    android:layout_marginBottom="24dp"/>
 
-        <!-- PANE 3: SCANNER SETTINGS -->
-        <eightbitlab.com.blurview.BlurView
-            android:id="@+id/scanner_settings_blur"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_glass"
-            android:clipToOutline="true"
-            app:blurOverlayColor="#00000000"
-            app:layout_constraintTop_toBottomOf="@id/ad_blocking_blur">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="24dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mute Media While Scanning"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="ADAM silences media audio while it is looking."
+                            android:textColor="#AAAAAA"
+                            android:textSize="12sp"/>
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sw_mute_media_auto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Auto Mode"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:checked="true"
+                        android:paddingStart="32dp"
+                        app:thumbTint="@color/switch_thumb"
+                        app:trackTint="@color/switch_track"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sw_mute_media_manual"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Manual Mode"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:paddingStart="32dp"
+                        app:thumbTint="@color/switch_thumb"
+                        app:trackTint="@color/switch_track"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#44FFFFFF"
+                    android:layout_marginBottom="24dp"/>
+
+                <!-- SECTION 2: SCANNER CONFIGURATION -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Scan Region"
+                    android:text="Scanner Tuning"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="16dp"
                     android:layout_gravity="center_horizontal"/>
 
                 <LinearLayout
@@ -278,21 +365,21 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="24dp"
                     android:max="45"
-                    android:progress="15"
+                    android:progress="30"
                     android:progressTint="#00e5ff"
                     android:thumbTint="#00e5ff" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#44FFFFFF"
+                    android:background="#22FFFFFF"
                     android:layout_marginBottom="24dp"/>
 
                 <TextView
                     android:id="@+id/accuracy_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Target Match Required: 85%"
+                    android:text="Target Match Required: 35%"
                     android:textColor="#FFFFFF"
                     android:textSize="14sp"
                     android:textStyle="bold"
@@ -304,8 +391,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:max="95"
-                    android:min="60"
-                    android:progress="85"
+                    android:min="35"
+                    android:progress="35"
                     android:progressTint="#00e5ff"
                     android:thumbTint="#00e5ff"
                     android:layout_marginBottom="4dp"/>
@@ -326,7 +413,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#44FFFFFF"
+                    android:background="#22FFFFFF"
                     android:layout_marginBottom="24dp"/>
 
                 <TextView
@@ -345,9 +432,37 @@
                     android:layout_height="wrap_content"
                     android:max="150"
                     android:min="50"
-                    android:progress="100"
+                    android:progress="50"
                     android:progressTint="#00e5ff"
                     android:thumbTint="#00e5ff" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#44FFFFFF"
+                    android:layout_marginVertical="24dp"/>
+
+                <!-- SECTION 3: SAM MANAGEMENT -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SAM Management"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_blocked_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_cyan_rounded"
+                    android:text="Select SAM Apps"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="16dp"/>
 
             </LinearLayout>
         </eightbitlab.com.blurview.BlurView>
